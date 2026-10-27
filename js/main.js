@@ -44,26 +44,47 @@
   track.addEventListener("scroll", updateDots, { passive: true });
   updateDots();
 
+  // Guardado en el celular de ella (si el navegador lo bloquea, todo sigue funcionando)
+  const store = {
+    get(k, fb) { try { return JSON.parse(localStorage.getItem(k)) ?? fb; } catch { return fb; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  };
+  const shortDate = (ts) => new Date(ts).toLocaleDateString("es-PE", { day: "numeric", month: "long" });
+
   // ---------- Carta ----------
   $("#letter-body").innerHTML =
     C.letter.map((t) => `<p>${t}</p>`).join("") +
-    `<p class="letter__sign">Con todo mi amor,<br><span>${C.fromName}</span></p>`;
+    `<p class="sheet__sign">Con todo mi amor,<br><span>${C.fromName}</span></p>`;
+  $$("#letter-body p").forEach((p, i) => p.style.setProperty("--i", i));
   const env = $("#envelope");
-  const openLetter = () => {
-    if (env.classList.contains("open")) return;
-    env.classList.add("open");
-    $("#envelope-hint").textContent = "";
+  const modal = $("#letter-modal");
+  const showSheet = () => {
+    modal.hidden = false;
+    document.body.classList.add("reading");
+    requestAnimationFrame(() => modal.classList.add("show"));
+    modal.scrollTop = 0;
     burst(40);
-    setTimeout(() => {
-      $("#letter").classList.add("open");
-      setTimeout(() => $("#letter").scrollIntoView({ behavior: "smooth", block: "start" }), 350);
-    }, 700);
+  };
+  const hideSheet = () => {
+    modal.classList.remove("show");
+    document.body.classList.remove("reading");
+    setTimeout(() => (modal.hidden = true), 500);
+  };
+  const openLetter = () => {
+    if (env.classList.contains("open")) return showSheet();
+    env.classList.add("open");
+    $("#envelope-hint").textContent = "toca el sobre para leerla otra vez";
+    setTimeout(showSheet, 1500);
   };
   env.addEventListener("click", openLetter);
   env.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " ") && openLetter());
+  $("#letter-close").addEventListener("click", hideSheet);
+  modal.addEventListener("click", (e) => e.target === modal && hideSheet());
+  addEventListener("keydown", (e) => e.key === "Escape" && !modal.hidden && hideSheet());
 
-  // ---------- Vales ----------
+  // ---------- Vales (una vez canjeados, se quedan así) ----------
   if (!C.coupons.length) $("#coupons-section").remove();
+  const redeemed = store.get("vales", {});
   C.coupons.forEach((c, i) => {
     const card = document.createElement("button");
     card.className = "coupon";
@@ -74,26 +95,65 @@
         <em>${c.note}</em>
       </span>
       <span class="coupon__face coupon__back">
-        <strong>¡Canjeado!</strong>
+        <small class="coupon__stamp"></small>
+        <strong>${c.title}</strong>
         <em>Muéstrale este vale a ${C.fromName} ♥</em>
       </span>`;
+    const markRedeemed = (ts) => {
+      card.classList.add("flipped");
+      card.setAttribute("aria-disabled", "true");
+      $(".coupon__stamp", card).textContent = `Canjeado el ${shortDate(ts)}`;
+    };
+    if (redeemed[i]) markRedeemed(redeemed[i]);
     card.addEventListener("click", () => {
-      card.classList.toggle("flipped");
-      if (card.classList.contains("flipped")) burst(25);
+      if (redeemed[i]) return;
+      redeemed[i] = Date.now();
+      store.set("vales", redeemed);
+      markRedeemed(redeemed[i]);
+      burst(25);
     });
     $("#coupons").appendChild(card);
   });
 
-  // ---------- Tarjeta para raspar ----------
-  if (!C.scratch) $("#scratch-section").remove();
+  // ---------- Tarjeta para raspar (una sorpresa al azar cada 24 h) ----------
+  if (!C.scratch.length) $("#scratch-section").remove();
   else {
-    fill("[data-scratch]", C.scratch);
+    const DAY = 24 * 60 * 60 * 1000;
     const sc = $("#scratch-cover");
     const sx = sc.getContext("2d");
-    let painted = false, done = false, drawing = false;
+    const hint = $("#scratch-hint");
+    let state, painted = false, done = false, drawing = false;
+
+    const newCard = () => {
+      const prev = state?.i;
+      let i;
+      do i = Math.floor(Math.random() * C.scratch.length);
+      while (C.scratch.length > 1 && i === prev);
+      state = { i, start: Date.now(), done: false };
+      store.set("rasca", state);
+    };
+    const setup = () => {
+      state = store.get("rasca", null);
+      if (!state || Date.now() - state.start >= DAY || !C.scratch[state.i]) newCard();
+      fill("[data-scratch]", C.scratch[state.i]);
+      done = state.done;
+      sc.classList.toggle("cleared", done);
+      if (!done) { hint.textContent = "raspa con tu dedo"; painted = false; paint(); }
+      updateWait();
+    };
+    const updateWait = () => {
+      if (!done) return;
+      const left = state.start + DAY - Date.now();
+      if (left <= 0) return setup();
+      const h = Math.floor(left / 3600000), m = Math.floor(left / 60000) % 60;
+      hint.textContent = `nueva sorpresa en ${h} h ${m} min`;
+    };
+    setInterval(updateWait, 30000);
+
     const paint = () => {
       const r = sc.getBoundingClientRect();
       if (!r.width) return;
+      sx.globalCompositeOperation = "source-over";
       const dpr = Math.min(devicePixelRatio || 1, 2);
       sc.width = r.width * dpr;
       sc.height = r.height * dpr;
@@ -124,23 +184,27 @@
       for (let i = 3; i < px.length; i += 64) if (px[i] === 0) clear++;
       if (clear / (px.length / 64) > 0.45) {
         done = true;
+        state.done = true;
+        store.set("rasca", state);
         sc.classList.add("cleared");
-        $("#scratch-hint").textContent = "";
+        updateWait();
         burst(50);
       }
     };
-    sc.addEventListener("pointerdown", (e) => { if (!painted) paint(); drawing = true; sc.setPointerCapture(e.pointerId); scratchAt(e); });
+    let touched = false;
+    sc.addEventListener("pointerdown", (e) => { if (!painted) paint(); touched = drawing = true; sc.setPointerCapture(e.pointerId); scratchAt(e); });
     sc.addEventListener("pointermove", (e) => drawing && scratchAt(e));
     sc.addEventListener("pointerup", () => { drawing = false; check(); });
-    document.fonts.ready.then(() => new IntersectionObserver((en, o) => {
-      if (en[0].isIntersecting) { paint(); o.disconnect(); }
-    }).observe(sc));
+    setup();
+    // Repinta con la tipografía ya cargada, si aún no la ha tocado
+    document.fonts.ready.then(() => !done && !touched && paint());
   }
 
   // ---------- Contador ----------
   if (C.startDate) {
     $("#counter").hidden = false;
     const start = new Date(C.startDate).getTime();
+    fill("[data-start-text]", `desde el ${new Date(start).toLocaleDateString("es-PE", { day: "numeric", month: "long", year: "numeric" })} ♥`);
     const tick = () => {
       let s = Math.max(0, Math.floor((Date.now() - start) / 1000));
       const v = { days: Math.floor(s / 86400), hours: Math.floor(s / 3600) % 24, minutes: Math.floor(s / 60) % 60, seconds: s % 60 };

@@ -57,6 +57,7 @@
           <div><strong data-c="minutes">0</strong><span>minutos</span></div>
           <div><strong data-c="seconds">0</strong><span>segundos</span></div>
         </div>
+        <p class="hint" data-start-text></p>
       </section>
 
       <!-- Galería tipo polaroid -->
@@ -82,14 +83,11 @@
           <div class="seal"><span data-initial></span></div>
         </div>
         <p class="hint" id="envelope-hint">toca el sello para abrirla</p>
-        <article class="letter" id="letter">
-          <div class="letter__body" id="letter-body"></div>
-        </article>
       </section>
 
       <!-- Tarjeta para raspar -->
       <section class="scratch-wrap reveal" id="scratch-section">
-        <p class="section-label">Una sorpresa más</p>
+        <p class="section-label">Tu sorpresa del día</p>
         <div class="scratch" id="scratch">
           <div class="scratch__prize">
             <svg viewBox="0 0 32 29" aria-hidden="true"><path d="M16 28.5S.5 19.3.5 9.1C.5 4.4 4.2.5 8.8.5c3 0 5.6 1.6 7.2 4.1C17.6 2.1 20.2.5 23.2.5c4.6 0 8.3 3.9 8.3 8.6 0 10.2-15.5 19.4-15.5 19.4z"/></svg>
@@ -104,7 +102,7 @@
       <section class="coupons reveal" id="coupons-section">
         <p class="section-label">Vales de amor</p>
         <div class="coupons__list" id="coupons"></div>
-        <p class="hint">toca un vale para canjearlo</p>
+        <p class="hint">toca un vale para canjearlo, cada uno vale una sola vez</p>
       </section>
 
       <!-- Cierre -->
@@ -117,6 +115,14 @@
       </footer>
     </div>
   </main>
+
+  <!-- La carta se despliega aquí, encima de todo -->
+  <div class="letter-modal" id="letter-modal" role="dialog" aria-modal="true" aria-label="Carta" hidden>
+    <article class="sheet" id="sheet">
+      <button class="sheet__close" id="letter-close" aria-label="Cerrar la carta">✕</button>
+      <div class="sheet__body" id="letter-body"></div>
+    </article>
+  </div>
 
   <button id="music-toggle" class="music" aria-label="Pausar música" hidden>
     <span></span><span></span><span></span>

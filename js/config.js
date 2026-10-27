@@ -7,7 +7,7 @@ window.CONFIG = {
   date: "2026-10-27",
 
   // Fecha en que empezaron (activa el contador). Déjalo en null para ocultarlo.
-  startDate: null, // ej: "2025-10-27T00:00:00"
+  startDate: "2024-11-27T00:00:00",
 
   // Foto grande de portada y foto del cierre
   heroPhoto: "assets/fotos/portada.jpg",
@@ -31,8 +31,25 @@ window.CONFIG = {
     "Gracias por cada día a tu lado.",
   ],
 
-  // Tarjeta para raspar. null = se oculta.
-  scratch: "Vale por una cita sorpresa conmigo ♥",
+  // Tarjeta para raspar: cada 24 h sale uno al azar. [] = se oculta.
+  scratch: [
+    "Eres lo más bonito que me ha pasado ♥",
+    "Hoy te debo un beso extra largo",
+    "Vale por un abrazo de esos que curan todo",
+    "Si pudiera elegir de nuevo, te elegiría mil veces",
+    "Tu sonrisa es mi lugar favorito",
+    "Hoy invito yo: tú eliges el antojo",
+    "Eres mi persona favorita en todo el mundo",
+    "Contigo hasta los días grises son bonitos",
+    "Vale por una cita sorpresa conmigo",
+    "Me haces feliz de formas que no sé explicar",
+    "Gracias por quedarte, por elegirme, por ser tú",
+    "Hoy te toca un masaje sin reclamos",
+    "Cada día te quiero un poquito más que ayer",
+    "Eres mi casualidad más bonita",
+    "Vale por una noche de pelis y abrazos",
+    "Mi corazón es tuyo, hoy y siempre",
+  ],
 
   // Vales de amor (se voltean al tocarlos). [] = se oculta.
   coupons: [
