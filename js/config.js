@@ -60,5 +60,5 @@ window.CONFIG = {
   ],
 
   // Canción opcional (mp3 en assets/musica/). null = sin música.
-  music: null, // ej: "assets/musica/cancion.mp3"
+  music: "assets/musica/sparks.mp3",
 };
