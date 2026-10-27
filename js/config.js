@@ -1,6 +1,6 @@
 // Todo el contenido personalizable está aquí.
 window.CONFIG = {
-  herName: "Melany",
+  herName: "Melanie",
   fromName: "Luka",
 
   // Fecha del aniversario (se muestra arriba)
