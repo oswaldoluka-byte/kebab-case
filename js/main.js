@@ -61,7 +61,8 @@
   const showSheet = () => {
     modal.hidden = false;
     document.body.classList.add("reading");
-    requestAnimationFrame(() => modal.classList.add("show"));
+    void modal.offsetHeight; // fuerza el reflujo para que la animación arranque cada vez
+    modal.classList.add("show");
     modal.scrollTop = 0;
     burst(40);
   };

@@ -26,9 +26,11 @@ window.CONFIG = {
 
   // Carta: cada elemento es un párrafo.
   letter: [
-    "Mi amor:",
-    "Aquí irán las palabras que te quiero decir. Este texto es provisional hasta tener la carta definitiva.",
-    "Gracias por cada día a tu lado.",
+    "Mi amor, feliz aniversario ❤️",
+    "Gracias por llegar a mi vida y hacerla más bonita con tu amor. Cada momento a tu lado se convierte en un recuerdo que guardo con mucho cariño.",
+    "A pesar de las dificultades, quiero que sigamos creciendo juntos y superando todo de la mano.",
+    "Eres una personita muy especial para mí y quiero seguir compartiendo muchos momentos contigo.",
+    "Te amo muchísimo, mi princesa, y espero que este sea uno de muchos aniversarios juntos. ❤️",
   ],
 
   // Tarjeta para raspar: cada 24 h sale uno al azar. [] = se oculta.
