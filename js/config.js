@@ -7,7 +7,7 @@ window.CONFIG = {
   date: "2026-10-27",
 
   // Fecha en que empezaron (activa el contador). Déjalo en null para ocultarlo.
-  startDate: "2024-11-27T00:00:00",
+  startDate: "2024-10-27T00:00:00",
 
   // Foto grande de portada y foto del cierre
   heroPhoto: "assets/fotos/portada.jpg",
