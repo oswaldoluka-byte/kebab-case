@@ -4,10 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Para Melany ♥</title>
-  <meta name="description" content="Algo especial, solo para ti.">
+  <meta name="description" content="He preparado algo especial para ti.">
   <meta name="theme-color" content="#f6efe6">
   <meta property="og:title" content="Para Melany ♥">
   <meta property="og:description" content="He preparado algo especial para ti.">
+  <meta property="og:image" content="assets/fotos/portada.jpg">
+  <link rel="preload" as="image" href="assets/fotos/portada.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Pinyon+Script&family=Jost:wght@300;400&display=swap" rel="stylesheet">
@@ -19,75 +21,101 @@
   <!-- Portada: lo primero que ve al escanear el QR -->
   <section id="gate" class="gate">
     <div class="gate__inner">
+      <p class="gate__date" data-date-short></p>
       <svg class="gate__heart" viewBox="0 0 32 29" aria-hidden="true"><path d="M16 28.5S.5 19.3.5 9.1C.5 4.4 4.2.5 8.8.5c3 0 5.6 1.6 7.2 4.1C17.6 2.1 20.2.5 23.2.5c4.6 0 8.3 3.9 8.3 8.6 0 10.2-15.5 19.4-15.5 19.4z"/></svg>
       <p class="gate__eyebrow">Para el amor de mi vida</p>
-      <button id="open-btn" class="btn">Toca aquí, <span data-her-name></span></button>
+      <button id="open-btn" class="btn">Te amo, <span data-her-name></span></button>
       <p class="gate__hint">sube el volumen ♪</p>
     </div>
   </section>
 
   <main id="story" class="story" aria-hidden="true">
 
-    <!-- Encabezado -->
-    <header class="hero reveal">
-      <p class="hero__date" data-date></p>
-      <h1 class="hero__title">Feliz aniversario</h1>
-      <p class="hero__name" data-her-name></p>
-      <div class="ornament" aria-hidden="true"><span></span>♥<span></span></div>
+    <!-- Foto de portada a pantalla completa -->
+    <header class="hero">
+      <div class="hero__photo"><img data-hero alt=""></div>
+      <div class="hero__text">
+        <p class="hero__date" data-date></p>
+        <h1 class="hero__title">Feliz aniversario</h1>
+        <p class="hero__name" data-her-name></p>
+      </div>
+      <div class="hero__scroll" aria-hidden="true"><span></span></div>
     </header>
 
-    <!-- Contador de tiempo juntos (se oculta si no hay startDate) -->
-    <section id="counter" class="counter reveal" hidden>
-      <p class="section-label">Juntos desde hace</p>
-      <div class="counter__grid">
-        <div><strong data-c="days">0</strong><span>días</span></div>
-        <div><strong data-c="hours">0</strong><span>horas</span></div>
-        <div><strong data-c="minutes">0</strong><span>minutos</span></div>
-        <div><strong data-c="seconds">0</strong><span>segundos</span></div>
+    <div class="content">
+      <section class="quote reveal">
+        <div class="ornament" aria-hidden="true"><span></span>♥<span></span></div>
+        <p data-quote></p>
+      </section>
+
+      <!-- Contador de tiempo juntos (se oculta si no hay startDate) -->
+      <section id="counter" class="counter reveal" hidden>
+        <p class="section-label">Juntos desde hace</p>
+        <div class="counter__grid">
+          <div><strong data-c="days">0</strong><span>días</span></div>
+          <div><strong data-c="hours">0</strong><span>horas</span></div>
+          <div><strong data-c="minutes">0</strong><span>minutos</span></div>
+          <div><strong data-c="seconds">0</strong><span>segundos</span></div>
+        </div>
+      </section>
+
+      <!-- Galería tipo polaroid -->
+      <section class="gallery reveal">
+        <p class="section-label">Nuestros momentos</p>
+        <div class="polaroids" id="polaroids" tabindex="0" aria-label="Fotos, desliza para ver más"></div>
+        <div class="dots" id="dots" aria-hidden="true"></div>
+        <p class="hint">desliza para ver más →</p>
+      </section>
+
+      <div class="divider reveal" aria-hidden="true">
+        <svg viewBox="0 0 120 20"><path d="M2 10 C 30 -4, 40 24, 60 10 S 90 -4, 118 10" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
       </div>
-    </section>
 
-    <!-- Galería tipo polaroid -->
-    <section class="gallery reveal">
-      <p class="section-label">Nuestros momentos</p>
-      <div class="polaroids" id="polaroids" tabindex="0" aria-label="Fotos, desliza para ver más"></div>
-      <div class="dots" id="dots" aria-hidden="true"></div>
-      <p class="gallery__hint">desliza →</p>
-    </section>
+      <!-- Carta -->
+      <section class="letter-wrap reveal">
+        <p class="section-label">Una carta para ti</p>
+        <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Abrir la carta">
+          <div class="envelope__back"></div>
+          <div class="envelope__paper"></div>
+          <div class="envelope__front"></div>
+          <div class="envelope__flap"></div>
+          <div class="seal"><span data-initial></span></div>
+        </div>
+        <p class="hint" id="envelope-hint">toca el sello para abrirla</p>
+        <article class="letter" id="letter">
+          <div class="letter__body" id="letter-body"></div>
+        </article>
+      </section>
 
-    <div class="divider reveal" aria-hidden="true">
-      <svg viewBox="0 0 120 20"><path d="M2 10 C 30 -4, 40 24, 60 10 S 90 -4, 118 10" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+      <!-- Tarjeta para raspar -->
+      <section class="scratch-wrap reveal" id="scratch-section">
+        <p class="section-label">Una sorpresa más</p>
+        <div class="scratch" id="scratch">
+          <div class="scratch__prize">
+            <svg viewBox="0 0 32 29" aria-hidden="true"><path d="M16 28.5S.5 19.3.5 9.1C.5 4.4 4.2.5 8.8.5c3 0 5.6 1.6 7.2 4.1C17.6 2.1 20.2.5 23.2.5c4.6 0 8.3 3.9 8.3 8.6 0 10.2-15.5 19.4-15.5 19.4z"/></svg>
+            <p data-scratch></p>
+          </div>
+          <canvas class="scratch__cover" id="scratch-cover"></canvas>
+        </div>
+        <p class="hint" id="scratch-hint">raspa con tu dedo</p>
+      </section>
+
+      <!-- Vales de amor -->
+      <section class="coupons reveal" id="coupons-section">
+        <p class="section-label">Vales de amor</p>
+        <div class="coupons__list" id="coupons"></div>
+        <p class="hint">toca un vale para canjearlo</p>
+      </section>
+
+      <!-- Cierre -->
+      <footer class="ending reveal">
+        <div class="arch"><img data-ending alt="" loading="lazy"></div>
+        <p class="ending__line">Y si tuviera que elegir otra vez,</p>
+        <p class="ending__big">te elegiría a ti</p>
+        <button class="btn btn--ghost" id="love-btn">♥ Te amo</button>
+        <p class="ending__sign">Por siempre tuyo, <span data-from-name></span></p>
+      </footer>
     </div>
-
-    <!-- Carta -->
-    <section class="letter-wrap reveal">
-      <p class="section-label">Una carta para ti</p>
-      <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Abrir la carta">
-        <div class="envelope__back"></div>
-        <div class="envelope__paper"></div>
-        <div class="envelope__front"></div>
-        <div class="envelope__flap"></div>
-        <div class="seal"><span data-initial></span></div>
-      </div>
-      <p class="letter-wrap__hint" id="envelope-hint">toca el sello para abrirla</p>
-      <article class="letter" id="letter">
-        <div class="letter__body" id="letter-body"></div>
-      </article>
-    </section>
-
-    <!-- Razones -->
-    <section class="reasons reveal" id="reasons-section">
-      <p class="section-label">Algunas razones por las que te amo</p>
-      <div class="reasons__grid" id="reasons"></div>
-    </section>
-
-    <!-- Cierre -->
-    <footer class="ending reveal">
-      <p class="ending__line">Y si tuviera que elegir otra vez,</p>
-      <p class="ending__big">te elegiría a ti</p>
-      <button class="btn btn--ghost" id="love-btn">♥ Te amo</button>
-      <p class="ending__sign" data-signature></p>
-    </footer>
   </main>
 
   <button id="music-toggle" class="music" aria-label="Pausar música" hidden>

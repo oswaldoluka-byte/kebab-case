@@ -4,15 +4,19 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
   // ---------- Contenido ----------
-  $$("[data-her-name]").forEach((el) => (el.textContent = C.herName));
-  $$("[data-initial]").forEach((el) => (el.textContent = C.herName.charAt(0)));
-  $$("[data-signature]").forEach((el) => (el.textContent = C.signature));
+  const fill = (sel, text) => $$(sel).forEach((el) => (el.textContent = text));
+  fill("[data-her-name]", C.herName);
+  fill("[data-from-name]", C.fromName);
+  fill("[data-initial]", C.herName.charAt(0));
+  fill("[data-quote]", C.quote);
+  $("[data-hero]").src = C.heroPhoto;
+  $("[data-ending]").src = C.endingPhoto;
 
   const [y, m, d] = C.date.split("-").map(Number);
-  const dateText = new Date(y, m - 1, d).toLocaleDateString("es-PE", {
+  fill("[data-date]", new Date(y, m - 1, d).toLocaleDateString("es-PE", {
     day: "numeric", month: "long", year: "numeric",
-  });
-  $$("[data-date]").forEach((el) => (el.textContent = dateText));
+  }));
+  fill("[data-date-short]", [d, m, y].map((n) => String(n).padStart(2, "0")).join(" · "));
 
   // ---------- Galería ----------
   const track = $("#polaroids");
@@ -43,7 +47,7 @@
   // ---------- Carta ----------
   $("#letter-body").innerHTML =
     C.letter.map((t) => `<p>${t}</p>`).join("") +
-    `<p class="letter__sign">${C.signature}</p>`;
+    `<p class="letter__sign">Con todo mi amor,<br><span>${C.fromName}</span></p>`;
   const env = $("#envelope");
   const openLetter = () => {
     if (env.classList.contains("open")) return;
@@ -58,15 +62,80 @@
   env.addEventListener("click", openLetter);
   env.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " ") && openLetter());
 
-  // ---------- Razones ----------
-  if (!C.reasons.length) $("#reasons-section").remove();
-  C.reasons.forEach((r, i) => {
+  // ---------- Vales ----------
+  if (!C.coupons.length) $("#coupons-section").remove();
+  C.coupons.forEach((c, i) => {
     const card = document.createElement("button");
-    card.className = "reason";
-    card.innerHTML = `<span class="reason__front">${String(i + 1).padStart(2, "0")}</span><span class="reason__back">${r}</span>`;
-    card.addEventListener("click", () => card.classList.toggle("flipped"));
-    $("#reasons").appendChild(card);
+    card.className = "coupon";
+    card.innerHTML = `
+      <span class="coupon__face coupon__front">
+        <small>Vale Nº ${String(i + 1).padStart(2, "0")}</small>
+        <strong>${c.title}</strong>
+        <em>${c.note}</em>
+      </span>
+      <span class="coupon__face coupon__back">
+        <strong>¡Canjeado!</strong>
+        <em>Muéstrale este vale a ${C.fromName} ♥</em>
+      </span>`;
+    card.addEventListener("click", () => {
+      card.classList.toggle("flipped");
+      if (card.classList.contains("flipped")) burst(25);
+    });
+    $("#coupons").appendChild(card);
   });
+
+  // ---------- Tarjeta para raspar ----------
+  if (!C.scratch) $("#scratch-section").remove();
+  else {
+    fill("[data-scratch]", C.scratch);
+    const sc = $("#scratch-cover");
+    const sx = sc.getContext("2d");
+    let painted = false, done = false, drawing = false;
+    const paint = () => {
+      const r = sc.getBoundingClientRect();
+      if (!r.width) return;
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      sc.width = r.width * dpr;
+      sc.height = r.height * dpr;
+      sx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const g = sx.createLinearGradient(0, 0, r.width, r.height);
+      g.addColorStop(0, "#d9b87c"); g.addColorStop(.5, "#f1dcae"); g.addColorStop(1, "#c39a5c");
+      sx.fillStyle = g;
+      sx.fillRect(0, 0, r.width, r.height);
+      sx.fillStyle = "rgba(255,255,255,.18)";
+      for (let i = 0; i < 260; i++) sx.fillRect(Math.random() * r.width, Math.random() * r.height, 1.5, 1.5);
+      sx.fillStyle = "#7a5526";
+      sx.font = "italic 500 22px 'Cormorant Garamond', serif";
+      sx.textAlign = "center";
+      sx.fillText("Rasca aquí ♥", r.width / 2, r.height / 2 + 7);
+      painted = true;
+    };
+    const scratchAt = (e) => {
+      const r = sc.getBoundingClientRect();
+      sx.globalCompositeOperation = "destination-out";
+      sx.beginPath();
+      sx.arc(e.clientX - r.left, e.clientY - r.top, 22, 0, Math.PI * 2);
+      sx.fill();
+    };
+    const check = () => {
+      if (done) return;
+      const px = sx.getImageData(0, 0, sc.width, sc.height).data;
+      let clear = 0;
+      for (let i = 3; i < px.length; i += 64) if (px[i] === 0) clear++;
+      if (clear / (px.length / 64) > 0.45) {
+        done = true;
+        sc.classList.add("cleared");
+        $("#scratch-hint").textContent = "";
+        burst(50);
+      }
+    };
+    sc.addEventListener("pointerdown", (e) => { if (!painted) paint(); drawing = true; sc.setPointerCapture(e.pointerId); scratchAt(e); });
+    sc.addEventListener("pointermove", (e) => drawing && scratchAt(e));
+    sc.addEventListener("pointerup", () => { drawing = false; check(); });
+    document.fonts.ready.then(() => new IntersectionObserver((en, o) => {
+      if (en[0].isIntersecting) { paint(); o.disconnect(); }
+    }).observe(sc));
+  }
 
   // ---------- Contador ----------
   if (C.startDate) {
@@ -182,4 +251,15 @@
     requestAnimationFrame(loop);
   }
   loop();
+
+  // Vista previa: /#ver o /#ver-<id> salta la portada (solo para revisar)
+  if (location.hash.startsWith("#ver")) {
+    document.body.classList.add("no-anim");
+    $("#open-btn").click();
+    $("#gate").remove();
+    $$(".reveal").forEach((el) => el.classList.add("in"));
+    const target = location.hash.slice(5);
+    if (target === "carta") env.click();
+    else if (target) setTimeout(() => $(`#${target}`)?.scrollIntoView({ block: "start", behavior: "instant" }), 300);
+  }
 })();
